@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quant Trading Bot Ledger</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: #f4f7f6; color: #333; margin: 40px; }
+        h1 { color: #1a365d; }
+        .table-container { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { padding: 12px 15px; text-align: left; border-bottom: 1px solid #e2e8f0; }
+        th { background-color: #2b6cb0; color: white; text-transform: uppercase; font-size: 12px; letter-spacing: 0.5px; }
+        tr:hover { background-color: #f7fafc; }
+        .side-buy { color: #38a169; font-weight: bold; }
+        .side-sell { color: #e53e3e; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+    <h1>💼 Live Trade Execution Ledger</h1>
+    <p>Automated updates directly from the cloud orchestration pipeline.</p>
+
+    <div class="table-container">
+        <table id="tradeTable">
+            <thead>
+                <tr>
+                    <th>Timestamp</th>
+                    <th>Ticker</th>
+                    <th>Side</th>
+                    <th>Quantity</th>
+                    <th>Est Price</th>
+                    <th>Total Capital</th>
+                    <th>AI Confidence</th>
+                    <th>Regime</th>
+                </tr>
+            </thead>
+            <tbody id="tableBody">
+                </tbody>
+        </table>
+    </div>
+
+    <script>
+        // Fetch the CSV file from your GitHub repository path
+        fetch('trade_execution_log.csv')
+            .then(response => response.text())
+            .then(csvData => {
+                Papa.parse(csvData, {
+                    header: true,
+                    skipEmptyLines: true,
+                    complete: function(results) {
+                        const rows = results.data;
+                        const tableBody = document.getElementById('tableBody');
+                        
+                        // Loop backwards to show the newest trades first
+                        for (let i = rows.length - 1; i >= 0; i--) {
+                            const row = rows[i];
+                            const tr = document.createElement('tr');
+                            
+                            const sideClass = row.Side === 'BUY' ? 'side-buy' : 'side-sell';
+
+                            tr.innerHTML = `
+                                <td>${row.Timestamp || ''}</td>
+                                <td><strong>${row.Ticker || ''}</strong></td>
+                                <td class="${sideClass}">${row.Side || ''}</td>
+                                <td>${row.Quantity || ''}</td>
+                                <td>$${row.Est_Entry_Price || ''}</td>
+                                <td>$${row.Total_Capital_Allocated || ''}</td>
+                                <td>${row.AI_Confidence || ''}%</td>
+                                <td>${row.Market_Regime || ''}</td>
+                            `;
+                            tableBody.appendChild(tr);
+                        }
+                    }
+                });
+            });
+    </script>
+</body>
+</html>
