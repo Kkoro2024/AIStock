@@ -2,39 +2,15 @@
 
 A quantitative, bi-directional algorithmic trading system built to isolate cross-sectional market alpha, eliminate historical target leakage (look-ahead bias), and execute risk-balanced long/short portfolio rotations via the Alpaca API.
 
----
-
-# 📊 Core System Architecture
-
-The pipeline is split into isolated, sequential modules designed to mimic institutional quantitative workflows:
-
-## 1. Universe Filtering (`get_universe.py`)
-- Gathers the liquid asset universe.
-
-## 2. Feature Engineering (`feature_engine.py`)
-- Computes macro indicators, technical features, and cross-sectional ranks with a strict 1-day lag to preserve timeline purity.
-
-## 3. Model Training (`train_model.py`)
-- Trains an XGBoost Classifier on historical data using a chronological (non-random) split to prevent backtest leakage.
-
-## 4. Live Evaluation (`live_portfolio.py`)
-- Extracts the current market state, scales features, and filters out low-confidence assets using a strict 54% hybrid probability threshold.
-
-## 5. Execution Router (`execute_trades.py`)
-- Splits risk capital into independent 50% Long and 50% Short allocation buckets to maintain a balanced, directional-neutral profile.
-
-## 6. Automation Layer (`orchestrate_cron.py` & `live_desk.py`)
-- Background daemons tracking high-precision clock intervals to handle hands-free live execution.
-
----
+```
 
 # 🛠️ Installation & Setup
 
 ## 1. Prerequisites
 
-Ensure your machine has Python 3.13+ installed.
+Ensure your machine has Python 3.13+ installed, as well as VS Code. If it doesn't, visit python.org to install.
 
-Verify your local installation:
+Verify your local installation by opening a new terminal (Terminal --> New Terminal) and running:
 
 ```powershell
 python --version
@@ -42,15 +18,19 @@ python --version
 
 ---
 
-## 2. Navigate to the Project Directory
+## 2. Open Your Project Folder
 
-```powershell
-cd C:\Users\theko\Stock_AI_Project
-```
+Once the github is downloaded, drag the zipped file to C:/Users/USERNAME.
+
+Extract the file.
+
+Make sure that you are in the correct folder. To do so in VS Code, click File --> Open Folder --> AIStock (AIStock should be in C:/Users/YOURUSERNAME/AIStock).
 
 ---
 
 ## 3. Install Required Dependencies
+
+Run this in your terminal:
 
 ```powershell
 pip install pandas numpy xgboost scikit-learn alpaca-trade-api yfinance joblib requests
@@ -73,9 +53,28 @@ Create a file named `alpaca_config.json` in the root project directory.
 
 ---
 
-# 📈 Initial Model Compilation Workflow
+## 5. Get your API Keys
+
+Go to the Alpaca Sign Up page and enter your name, email, and password.
+Verify your email address through the link sent by Alpaca, then secure your account by enabling Multi-Factor Authentication (MFA) on your dashboard.
+Once logged into the Alpaca web dashboard, click the account selector menu (usually in the upper-left corner) and select the Paper Trading environment.
+Locate the API Keys panel on the right sidebar of the dashboard. Click Generate New Keys.
+Copy and save your paper trading API Key and Secret and replace them in your alpaca_config.json. These will be different from your live account keys.
+
+Paper trading API key replaces "YOUR_LIVE_OR_PAPER_API_KEY"
+Secret Key replaces "YOUR_LIVE_OR_PAPER_SECRET_KEY"
+
+Go to newsapi.com/register.
+Register for your api key using your email.
+When you get the api key, replace it in the json file where it says "YOUR_OPTIONAL_NEWS_API_KEY"
+
+---
+
+# What scripts to run (*RUN THESE FIRST*).
 
 ## Step 1 — Generate Master Features
+
+Type this in and hit enter:
 
 ```powershell
 python feature_engine.py
@@ -88,6 +87,8 @@ python feature_engine.py
 ---
 
 ## Step 2 — Train the Quantitative Model
+
+Type this in and hit enter:
 
 ```powershell
 python train_model.py
@@ -104,6 +105,8 @@ python train_model.py
 
 ## Terminal 1 — Launch the Clock Monitor Orchestrator
 
+Type this into the terminal before 6:50 AM to gather stock data:
+
 ```powershell
 python orchestrate_cron.py
 ```
@@ -115,6 +118,8 @@ Runs:
 ---
 
 ## Terminal 2 — Launch the Risk Monitor Desk
+
+As well as this with orchestrate_cron.py
 
 ```powershell
 python live_desk.py
